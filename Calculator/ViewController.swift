@@ -11,14 +11,26 @@ import UIKit
 class ViewController: UIViewController {
 
     // the label to display result
-    @IBOutlet weak var display: UILabel!
+    @IBOutlet private weak var display: UILabel!
     
     // whether to clear display
-    var shouldClearDisplay = true
+    private var shouldClearDisplay = true
     
+    private var displayValue : Double {
+        // get a double from display
+        get {
+            return Double(display.text!)!
+        }
+        // set the display text to new value by =
+        set {
+            display.text = String(newValue)
+        }
+    }
+    
+    private var brain = CalculatorBrain()
     
     // the action for digit
-    @IBAction func touchDigit(_ sender: UIButton) {
+    @IBAction private func touchDigit(_ sender: UIButton) {
         let digit = sender.currentTitle!
 
         if shouldClearDisplay {
@@ -34,16 +46,22 @@ class ViewController: UIViewController {
     }
 
     // the action for operations
-    @IBAction func performOperation(_ sender: UIButton) {
+    @IBAction private func performOperation(_ sender: UIButton) {
 
-        if let operation = sender.currentTitle {
-            if operation == "π" {
-                display.text = String(M_PI)
-            }
+        // set the value to calculate
+        if !shouldClearDisplay {
+            brain.setOperand(operand: displayValue)
+            // don't allow to input more after the operation
+            shouldClearDisplay = true
         }
         
-        // don't allow to input more after the operation
-        shouldClearDisplay = true
+        // do the calculation and update result
+        if let operation = sender.currentTitle {
+            brain.performOperation(symbol: operation)
+        }
+
+        // show the result on display
+        displayValue = brain.result
     }
 }
 
